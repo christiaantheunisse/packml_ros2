@@ -96,4 +96,4 @@ endif()
 #Substituting the catkin_package () components:
 ament_export_targets(${PROJECT_NAME}-targets)
 ament_export_dependencies(packml_sm)
-ament_package()
+ament_package(CONFIG_EXTRAS cmake/packml_ros-extras.cmake)

@@ -107,7 +107,16 @@ class PackmlNodeInterface
 
   protected:
 
-  inline void init(rclcpp::Node::SharedPtr node) {
+  inline auto get_current_packml_mode() const -> packml_sm::ModeType { return current_mode; }
+
+  inline auto get_current_packml_state() const -> packml_sm::State { return current_state; }
+
+  inline bool is_switching_mode() const { return waiting_for_new_mode; }
+
+  inline bool is_switching_state() const { return waiting_for_new_state; }
+
+  template <typename NodeT>
+  inline void init(std::shared_ptr<NodeT> node) {
     /**
     * @brief Callback function upon transition request by a client
     * @param req - data coming from the client
@@ -129,7 +138,7 @@ class PackmlNodeInterface
             }
             // TODO: else disabled, because currently a node cannot catch-up if it missed a state change
             // else {
-              if (on_state_trans_req()) {
+              if (on_state_trans_req(state)) {
                 std::cout << "Node approved state switch" << std::endl;
                 waiting_for_new_state = true;
                 switching_state = state;
@@ -164,7 +173,7 @@ class PackmlNodeInterface
             }
             // TODO: else disabled, because currently a node cannot catch-up if it missed a mode change
             // else {
-              if (on_mode_trans_req()){
+              if (on_mode_trans_req(mode)){
                 std::cout << "Node approved mode switch" << std::endl;
                 waiting_for_new_mode = true;
                 switching_mode = mode;
@@ -224,9 +233,9 @@ class PackmlNodeInterface
         }
       };
 
-    trans_server_ = node->create_service<packml_msgs::srv::StateTransition>("~/packml_state_transition", onStateTranseReq);
-    mode_server_ = node->create_service<packml_msgs::srv::ModeTransition>("~/packml_mode_transition", onModeTransReq);
-    status_sub_ = node->create_subscription<packml_msgs::msg::Status>("packml_status", rclcpp::SensorDataQoS(), onStatusChanged);
+    trans_server_ = node->template create_service<packml_msgs::srv::StateTransition>("~/packml_state_transition", onStateTranseReq);
+    mode_server_ = node->template create_service<packml_msgs::srv::ModeTransition>("~/packml_mode_transition", onModeTransReq);
+    status_sub_ = node->template create_subscription<packml_msgs::msg::Status>("packml_status", rclcpp::SensorDataQoS(), onStatusChanged);
 
     std::cout << "Services created!" << std::endl;
 
@@ -236,9 +245,9 @@ class PackmlNodeInterface
     switching_state = packml_sm::State::UNDEFINED;
   }
 
-  virtual bool on_state_trans_req() = 0;
+  virtual bool on_state_trans_req(packml_sm::State switching_state) = 0;
 
-  virtual bool on_mode_trans_req() = 0;
+  virtual bool on_mode_trans_req(packml_sm::ModeType switching_mode) = 0;
 
   virtual void on_status_changed() = 0;
 };

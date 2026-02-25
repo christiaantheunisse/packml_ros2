@@ -420,7 +420,7 @@ public:
   {
     printf("This is my execute method (begin)\n");
     // while (rclcpp::ok()) {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    // std::this_thread::sleep_for(std::chrono::seconds(1));
     // }
     printf("This is my execute method (end)\n");
     return 0;  // returning zero indicates non-failure

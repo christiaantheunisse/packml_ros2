@@ -128,4 +128,4 @@ endif()
 #CATKIN_DEPENDS
 ament_export_targets(${PROJECT_NAME}-targets HAS_LIBRARY_TARGET)
 ament_export_dependencies(rqt_gui_cpp)
-ament_package()
+ament_package(CONFIG_EXTRAS cmake/packml_sm-extras.cmake)
