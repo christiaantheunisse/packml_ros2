@@ -31,6 +31,7 @@
 #include <packml_msgs/srv/state_change.hpp>
 #include <packml_msgs/srv/all_status.hpp>
 // #include <packml_msgs/srv  //mode_change.hpp>
+#include <packml_msgs/msg/mode.hpp>
 
 // Global variables for the node topics and services
 /**
@@ -233,7 +234,7 @@ public:
     init(node, sm);
 
 
-    sm->changeMode(3);  // 3 = MANUAL
+    sm->changeMode(packml_msgs::msg::Mode::MANUAL);
 
 
 

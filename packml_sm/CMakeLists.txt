@@ -35,6 +35,9 @@ find_package(rclcpp REQUIRED)
 find_package(rqt_gui_cpp REQUIRED)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 
+# Include the modes generation function so it can be used during this build.
+include(cmake/packml_sm_generate_modes.cmake)
+
 
 # #include all directories
 # include_directories(
@@ -91,6 +94,9 @@ target_include_directories(
            $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
 
 target_cxx_version(${PROJECT_NAME} PUBLIC VERSION 23)
+
+# Generate the default PackML modes header from the yaml file.
+packml_sm_generate_modes(${PROJECT_NAME} modes/default_modes.yaml)
 
 #install
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})

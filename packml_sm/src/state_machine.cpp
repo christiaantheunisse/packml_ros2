@@ -15,6 +15,7 @@
 
 #include "packml_sm/state_machine.hpp"
 
+#include "default_modes.hpp"
 #include "packml_sm/common.hpp"
 #include "packml_sm/states/wait_state.hpp"
 #include "packml_sm/states_generator.hpp"
@@ -424,7 +425,7 @@ std::expected<bool, std::string> StateMachine::changeMode(ModeType mode)
     {State::COMPLETE, true},
   };
 
-  if (mode == 2)  // 2 = MAINTENANCE
+  if (mode == packml_modes::Maintenance)
   {
     // We disabled the state completing here!
     avail =

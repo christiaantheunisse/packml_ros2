@@ -1,0 +1,5 @@
+modes:
+  Invalid: 0
+  Production: 1
+  Maintenance: 2
+  Manual: 3

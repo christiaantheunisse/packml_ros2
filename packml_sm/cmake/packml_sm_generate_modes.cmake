@@ -43,7 +43,7 @@ set(_packml_sm_cmake_dir "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL
 #   }
 #
 function(packml_sm_generate_modes target yaml_file)
-  find_package(Python3 REQUIRED COMPONENTS Interpreter QUIET)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
   get_filename_component(yaml_abs "${yaml_file}" ABSOLUTE
     BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")

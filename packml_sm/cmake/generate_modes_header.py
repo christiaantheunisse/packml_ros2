@@ -71,7 +71,12 @@ def generate_modes_header(yaml_file, output_file):
 
     os.makedirs(os.path.dirname(os.path.abspath(output_file)), exist_ok=True)
 
-    header_guard = os.path.basename(output_file).upper().replace('.', '_').replace('-', '_')
+    import hashlib
+    path_hash = hashlib.md5(os.path.abspath(yaml_file).encode()).hexdigest()[:8].upper()
+    header_guard = (
+        os.path.basename(output_file).upper().replace('.', '_').replace('-', '_')
+        + '_' + path_hash + '_'
+    )
 
     with open(output_file, 'w') as f:
         f.write(f'// Auto-generated from {os.path.basename(yaml_file)} -- do not edit manually\n')
