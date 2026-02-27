@@ -117,31 +117,13 @@ inline std::ostream& operator<< (std::ostream& os, State state)
 }
 
 // Aligned with Mode.msg
-enum class ModeType
-{
-  UNDEFINED   = 0,
-  PRODUCTION  = 1,
-  MAINTENANCE = 2,
-  MANUAL      = 3
-};
+// ModeType is an alias for int, allowing user-defined mode values via
+// the packml_sm_generate_modes CMake function.
+using ModeType = int;
 
 inline std::string to_string(const ModeType& mode)
 {
-  switch (mode) {
-    case ModeType::UNDEFINED:   return "UNDEFINED";
-    case ModeType::PRODUCTION:  return "PRODUCTION";
-    case ModeType::MAINTENANCE: return "MAINTENANCE";
-    case ModeType::MANUAL:      return "MANUAL";
-  }
-  if (mode > ModeType::MANUAL) {
-    return "USER_DEFINED";
-  }
-  return std::to_string(static_cast<typename std::underlying_type<ModeType>::type>(mode));
-}
-
-inline std::ostream& operator<< (std::ostream& os, ModeType mode)
-{
-  return os << to_string(mode);
+  return std::to_string(mode);
 }
 
 // Aligned with Transition.srv

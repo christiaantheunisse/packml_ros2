@@ -96,6 +96,13 @@ target_cxx_version(${PROJECT_NAME} PUBLIC VERSION 23)
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
 install(
+  FILES
+    cmake/packml_sm_generate_modes.cmake
+    cmake/generate_modes_header.py
+  DESTINATION share/${PROJECT_NAME}/cmake
+)
+
+install(
   TARGETS ${PROJECT_NAME}
   EXPORT ${PROJECT_NAME}-targets
   LIBRARY DESTINATION lib

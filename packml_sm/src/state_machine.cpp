@@ -424,7 +424,7 @@ std::expected<bool, std::string> StateMachine::changeMode(ModeType mode)
     {State::COMPLETE, true},
   };
 
-  if (mode == ModeType::MAINTENANCE)
+  if (mode == 2)  // 2 = MAINTENANCE
   {
     // We disabled the state completing here!
     avail =

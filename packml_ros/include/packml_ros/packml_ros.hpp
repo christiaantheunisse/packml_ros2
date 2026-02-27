@@ -180,23 +180,7 @@ public:
     auto modeRequest = [this](const std::shared_ptr<packml_msgs::srv::ModeChange::Request> req,
                                           std::shared_ptr<packml_msgs::srv::ModeChange::Response> res)-> void {
 
-      packml_sm::ModeType mode;
-
-      switch (req->mode.val) {
-        case packml_msgs::msg::Mode::MAINTENANCE:
-          mode = packml_sm::ModeType::MAINTENANCE;
-          break;
-        case packml_msgs::msg::Mode::MANUAL:
-          mode = packml_sm::ModeType::MANUAL;
-          break;
-        case packml_msgs::msg::Mode::PRODUCTION:
-          mode = packml_sm::ModeType::PRODUCTION;
-          break;
-        case packml_msgs::msg::Mode::UNDEFINED:
-        default:
-          mode = packml_sm::ModeType::UNDEFINED;
-          break;
-      }
+      packml_sm::ModeType mode = static_cast<packml_sm::ModeType>(req->mode.val);
 
       auto succes = sm->changeMode(mode);
 

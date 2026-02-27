@@ -233,7 +233,7 @@ public:
     init(node, sm);
 
 
-    sm->changeMode(packml_sm::ModeType::MANUAL);
+    sm->changeMode(3);  // 3 = MANUAL
 
 
 
