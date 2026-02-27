@@ -4,7 +4,7 @@ modes:
   Maintenance: 2
   Manual: 3
 
-# Per-mode state availability masks.
+# Optional per-mode state availability masks.
 # Each entry maps a mode name (matching the 'modes' section) to a set of
 # PackML state names (matching packml_sm::State enum) with a boolean flag.
 # States not listed for a mode default to true (available).

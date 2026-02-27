@@ -87,15 +87,18 @@ def generate_modes_header(yaml_file, output_file):
         f.write('namespace packml_modes {\n\n')
         for name, value in modes.items():
             f.write(f'constexpr packml_sm::ModeType {name} = {value};\n')
-        f.write('\ninline std::string to_string(packml_sm::ModeType mode)\n')
+        f.write('\n}  // namespace packml_modes\n\n')
+        f.write('namespace packml_sm {\n\n')
+        f.write('template<>\n')
+        f.write('inline std::string to_string<ModeType>(ModeType mode)\n')
         f.write('{\n')
         f.write('  switch (mode) {\n')
         for name, value in modes.items():
-            f.write(f'    case {value}: return "{name}";\n')
+            f.write(f'      case {value}: return "{name}";\n')
         f.write('    default: return std::to_string(mode);\n')
         f.write('  }\n')
         f.write('}\n')
-        f.write('\n}  // namespace packml_modes\n\n')
+        f.write('\n}  // namespace packml_sm\n\n')
         f.write(f'#endif  // {header_guard}_\n')
 
 

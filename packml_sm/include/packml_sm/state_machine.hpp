@@ -326,7 +326,7 @@ public:
       std::cout << "Default callback; State changed to: " << name.toStdString() << "(" << value << ")" << std::endl;
     };
   std::function<void(ModeType value)> on_mode_changed = [](packml_sm::ModeType value) {
-      std::cout << "Default callback; Mode changed to: " << value << std::endl;
+      std::cout << "Default callback; Mode changed to: " << packml_sm::to_string(value) << std::endl;
     };
 
   /**

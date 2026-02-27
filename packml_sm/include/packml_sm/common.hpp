@@ -121,14 +121,13 @@ inline std::ostream& operator<< (std::ostream& os, State state)
 // states are active for a given mode.
 using AvailableStates = std::map<State, bool>;
 
-// Aligned with Mode.msg
 // ModeType is an alias for int, allowing user-defined mode values via
 // the packml_sm_generate_modes CMake function.
 using ModeType = int;
 
-inline std::string to_string(const ModeType& mode)
-{
-  return std::to_string(mode);
+template<typename T>
+std::string to_string(T mode) {
+  return std::to_string(static_cast<int>(mode));
 }
 
 // Aligned with Transition.srv

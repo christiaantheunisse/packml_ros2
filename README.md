@@ -70,6 +70,40 @@ Extras:
         
   Load the plugin called `packml_plugin` from the list of plugins. As with the simulator, the state machine diagram should appear in RViz, along the buttons for the control of the machine.
 
+## Define your own modes
+
+By default, no mode names are defined and there is no state configuration. So a requested mode will just be an integer and each state is allowed. To define your own modes:
+
+1. Create a YAML-file similar to `packml_sm/modes/default_modes(_minimal).yaml` in your project. The initial mode is always 0, so it is advised to make this *Invalid/Undefined* or something similar. For example:
+
+        modes:
+            Invalid: 0
+            Production: 1
+            Service: 2
+            DryRun: 3
+            Commissioning: 4
+
+2. Add the following line to the `CMakeList.txt` of your project
+
+        // CMakeList.txt
+        packml_sm_generate_modes(${PROJECT_NAME} path/to/your/modes.yaml)
+
+3. Include the modes in your code
+
+        // your_code.hpp/cpp
+        #include "packml_modes.hpp"
+
+        // Usage
+        auto mode = get_current_packml_mode();
+        auto mode_as_string = packml_sm::to_string(mode);
+        switch (mode)
+        {
+            case packml_modes::Invalid:
+            case packml_modes::Production:
+            case packml_modes::Service:
+            // etc.
+        }
+
 ## Contributors
 * Dejanira Araiza Illan
 * Chen Bainian
