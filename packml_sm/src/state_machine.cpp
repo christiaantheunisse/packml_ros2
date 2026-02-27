@@ -403,8 +403,7 @@ std::expected<bool, std::string> StateMachine::changeState(TransitionCmd command
 
 std::expected<bool, std::string> StateMachine::changeMode(ModeType mode)
 {
-  // TODO: define available states elsewhere
-  StatesGenerator::AvailableStates avail{
+  AvailableStates avail{
     {State::ABORTING, true},
     {State::ABORTED, true},
     {State::CLEARING, true},
@@ -423,7 +422,11 @@ std::expected<bool, std::string> StateMachine::changeMode(ModeType mode)
     {State::COMPLETING, true},
     {State::COMPLETE, true},
   };
+  return changeMode(mode, avail);
+}
 
+std::expected<bool, std::string> StateMachine::changeMode(ModeType mode, AvailableStates avail)
+{
   // TODO: Mode should have reference to ModeType?
   StatesGenerator::Mode mode1 = StatesGenerator::Mode(to_string(mode), avail);
 

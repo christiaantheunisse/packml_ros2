@@ -24,6 +24,7 @@
 #include <thread>
 #include <sstream>
 #include "packml_ros/interface/packml_interface.hpp"
+#include "packml_ros/modes_config.hpp"
 #include "packml_sm/common.hpp"
 #include "packml_sm/state_machine.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -236,7 +237,26 @@ public:
     // Default is 0 (Invalid/undefined). Users should set this to the desired
     // starting mode value defined in their modes YAML file.
     node->declare_parameter("initial_mode", 0);
-    sm->changeMode(static_cast<packml_sm::ModeType>(node->get_parameter("initial_mode").as_int()));
+    auto initial_mode = static_cast<packml_sm::ModeType>(node->get_parameter("initial_mode").as_int());
+
+    // Optional: load per-mode state masks from a YAML configuration file.
+    // The 'modes_config_file' parameter should be set to the path of the
+    // modes YAML file (the same file used for mode constants generation).
+    // States not listed in the mask for a mode default to true (available).
+    node->declare_parameter("modes_config_file", std::string(""));
+    auto modes_config_path = node->get_parameter("modes_config_file").as_string();
+
+    if (!modes_config_path.empty()) {
+      auto state_masks = packml_ros::parse_modes_config(modes_config_path);
+      auto it = state_masks.find(initial_mode);
+      if (it != state_masks.end()) {
+        sm->changeMode(initial_mode, it->second);
+      } else {
+        sm->changeMode(initial_mode);
+      }
+    } else {
+      sm->changeMode(initial_mode);
+    }
 
     // // Needs to be calibrated with the time of the PLC
     // sm->setExecute(std::bind(myExecuteMethod));

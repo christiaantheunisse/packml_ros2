@@ -17,6 +17,7 @@
 #ifndef PACKML_SM__COMMON_HPP_
 #define PACKML_SM__COMMON_HPP_
 
+#include <map>
 #include <ostream>
 #include <string>
 #include <type_traits>
@@ -115,6 +116,10 @@ inline std::ostream& operator<< (std::ostream& os, State state)
 {
   return os << to_string(state);
 }
+
+// Map of PackML states to their availability flag, used to configure which
+// states are active for a given mode.
+using AvailableStates = std::map<State, bool>;
 
 // Aligned with Mode.msg
 // ModeType is an alias for int, allowing user-defined mode values via
