@@ -15,7 +15,6 @@
 
 #include "packml_sm/state_machine.hpp"
 
-#include "default_modes.hpp"
 #include "packml_sm/common.hpp"
 #include "packml_sm/states/wait_state.hpp"
 #include "packml_sm/states_generator.hpp"
@@ -424,31 +423,6 @@ std::expected<bool, std::string> StateMachine::changeMode(ModeType mode)
     {State::COMPLETING, true},
     {State::COMPLETE, true},
   };
-
-  if (mode == packml_modes::Maintenance)
-  {
-    // We disabled the state completing here!
-    avail =
-    {
-    {State::ABORTING, true},
-    {State::ABORTED, true},
-    {State::CLEARING, true},
-    {State::STOPPING, true},
-    {State::STOPPED, true},
-    {State::RESETTING, true},
-    {State::IDLE, true},
-    {State::STARTING, true},
-    {State::EXECUTE, true},
-    {State::HOLDING, true},
-    {State::HELD, true},
-    {State::UNHOLDING, true},
-    {State::SUSPENDING, true},
-    {State::SUSPENDED, true},
-    {State::UNSUSPENDING, true},
-    {State::COMPLETING, false},
-    {State::COMPLETE, true},
-    };
-  }
 
   // TODO: Mode should have reference to ModeType?
   StatesGenerator::Mode mode1 = StatesGenerator::Mode(to_string(mode), avail);

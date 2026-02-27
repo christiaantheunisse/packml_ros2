@@ -31,7 +31,6 @@
 #include <packml_msgs/srv/state_change.hpp>
 #include <packml_msgs/srv/all_status.hpp>
 // #include <packml_msgs/srv  //mode_change.hpp>
-#include <packml_msgs/msg/mode.hpp>
 
 // Global variables for the node topics and services
 /**
@@ -233,11 +232,11 @@ public:
 
     init(node, sm);
 
-
-    sm->changeMode(packml_msgs::msg::Mode::MANUAL);
-
-
-
+    // Initial mode is configurable via the 'initial_mode' parameter (int).
+    // Default is 0 (Invalid/undefined). Users should set this to the desired
+    // starting mode value defined in their modes YAML file.
+    node->declare_parameter("initial_mode", 0);
+    sm->changeMode(static_cast<packml_sm::ModeType>(node->get_parameter("initial_mode").as_int()));
 
     // // Needs to be calibrated with the time of the PLC
     // sm->setExecute(std::bind(myExecuteMethod));

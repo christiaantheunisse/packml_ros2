@@ -220,7 +220,7 @@ class PackmlNodeInterface
             std::cout << "State and Mode switch detected!" << std::endl;
           }
           std::cout << "Mode change" << std::endl;
-          if (switching_mode != mode && switching_mode != packml_msgs::msg::Mode::UNDEFINED) {
+          if (switching_mode != mode && switching_mode != 0) {
             std::cout << "Mode published(" << mode << ") is not the Mode expected (" << switching_mode << ") switching to" << std::endl;
           }
           // TODO: else disabled, because currently a node cannot catch-up if it missed a mode change
@@ -239,9 +239,9 @@ class PackmlNodeInterface
 
     std::cout << "Services created!" << std::endl;
 
-    current_mode = packml_msgs::msg::Mode::UNDEFINED;
+    current_mode = 0;
     current_state = packml_sm::State::UNDEFINED;
-    switching_mode = packml_msgs::msg::Mode::UNDEFINED;
+    switching_mode = 0;
     switching_state = packml_sm::State::UNDEFINED;
   }
 
@@ -596,9 +596,9 @@ protected:
 
     node_names_= node->get_parameter("node_names").as_string_array();
 
-    current_mode = packml_msgs::msg::Mode::UNDEFINED;
+    current_mode = 0;
     current_state = packml_sm::State::UNDEFINED;
-    switching_mode = packml_msgs::msg::Mode::UNDEFINED;
+    switching_mode = 0;
     switching_state = packml_sm::State::UNDEFINED;
 
     // Create clients for all nodes
