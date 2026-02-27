@@ -161,7 +161,7 @@ class PackmlNodeInterface
       [this](const std::shared_ptr<packml_msgs::srv::ModeTransition::Request> req,
         std::shared_ptr<packml_msgs::srv::ModeTransition::Response> res)-> void {
             auto mode = static_cast<packml_sm::ModeType>(req->mode.val);
-            std::cout << "Node Mode changing to: " << to_string(mode) << std::endl;
+            std::cout << "Node Mode changing to: " << packml_sm::to_string(mode) << std::endl;
 
             bool success = false;
             std::string error_string;
@@ -220,14 +220,14 @@ class PackmlNodeInterface
             std::cout << "State and Mode switch detected!" << std::endl;
           }
           std::cout << "Mode change" << std::endl;
-          if (switching_mode != mode && switching_mode != packml_sm::ModeType::UNDEFINED) {
-            std::cout << "Mode published(" << mode << ") is not the Mode expected (" << switching_mode << ") switching to" << std::endl;
+          if (switching_mode != mode && switching_mode != 0) {
+            std::cout << "Mode published(" << packml_sm::to_string(mode) << ") is not the Mode expected (" << packml_sm::to_string(switching_mode) << ") switching to" << std::endl;
           }
           // TODO: else disabled, because currently a node cannot catch-up if it missed a mode change
           // else {
             current_mode = mode;
             waiting_for_new_mode = false;
-            std::cout << "Mode changed to:" << mode << std::endl;
+            std::cout << "Mode changed to: " << packml_sm::to_string(mode) << std::endl;
             on_status_changed();
           // }
         }
@@ -239,9 +239,9 @@ class PackmlNodeInterface
 
     std::cout << "Services created!" << std::endl;
 
-    current_mode = packml_sm::ModeType::UNDEFINED;
+    current_mode = 0;
     current_state = packml_sm::State::UNDEFINED;
-    switching_mode = packml_sm::ModeType::UNDEFINED;
+    switching_mode = 0;
     switching_state = packml_sm::State::UNDEFINED;
   }
 
@@ -321,7 +321,7 @@ protected:
 
     // for all clients, check if service is available and send request
     for (const auto & [client, val] : client_map_) {
-      // std::cout << "Requesting node " << key << " to change mode to: " << switching_mode << std::endl;
+      // std::cout << "Requesting node " << key << " to change mode to: " << packml_sm::to_string(switching_mode) << std::endl;
 
       if (!func(val)->wait_for_service(std::chrono::seconds(1))){
         std::cout << "Client :" << client << " Service: "<< func(val)->get_service_name() << " is unavailable!" << std::endl;
@@ -414,7 +414,7 @@ protected:
     mode.val = static_cast<signed char>(current_mode);
     msg.get().mode = mode;
 
-    std::cout << "Current mode: " << current_mode << std::endl;
+    std::cout << "Current mode: " << packml_sm::to_string(current_mode) << std::endl;
 
     std::cout << "publising message" << std::endl;
     status_pub_->publish(std::move(msg));
@@ -596,9 +596,9 @@ protected:
 
     node_names_= node->get_parameter("node_names").as_string_array();
 
-    current_mode = packml_sm::ModeType::UNDEFINED;
+    current_mode = 0;
     current_state = packml_sm::State::UNDEFINED;
-    switching_mode = packml_sm::ModeType::UNDEFINED;
+    switching_mode = 0;
     switching_state = packml_sm::State::UNDEFINED;
 
     // Create clients for all nodes

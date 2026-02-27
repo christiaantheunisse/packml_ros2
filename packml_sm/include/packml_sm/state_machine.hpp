@@ -124,6 +124,16 @@ public:
 
   virtual std::expected<bool, std::string> changeMode(ModeType mode) = 0;
 
+  /// Change to @p mode using the provided @p avail map to configure which
+  /// states are active.  The base-class implementation simply delegates to
+  /// changeMode(mode) so that concrete classes that do not override it still
+  /// compile.  StateMachine provides a full override.
+  virtual std::expected<bool, std::string> changeMode(ModeType mode, AvailableStates avail)
+  {
+    (void)avail;
+    return changeMode(mode);
+  }
+
   virtual std::expected<bool, std::string> changeState(TransitionCmd command) = 0;
 
 
@@ -308,13 +318,15 @@ public:
 
   virtual std::expected<bool, std::string> changeMode(ModeType mode);
 
+  virtual std::expected<bool, std::string> changeMode(ModeType mode, AvailableStates avail);
+
   virtual std::expected<bool, std::string> changeState(TransitionCmd mode);
 
   std::function<void(State value, QString name)> on_state_changed = [](packml_sm::State value, QString name){
       std::cout << "Default callback; State changed to: " << name.toStdString() << "(" << value << ")" << std::endl;
     };
   std::function<void(ModeType value)> on_mode_changed = [](packml_sm::ModeType value) {
-      std::cout << "Default callback; Mode changed to: " << value << std::endl;
+      std::cout << "Default callback; Mode changed to: " << packml_sm::to_string(value) << std::endl;
     };
 
   /**

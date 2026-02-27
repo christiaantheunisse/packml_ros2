@@ -1,0 +1,65 @@
+modes:
+  Invalid: 0
+  Production: 1
+  Maintenance: 2
+  Manual: 3
+
+# Optional per-mode state availability masks.
+# Each entry maps a mode name (matching the 'modes' section) to a set of
+# PackML state names (matching packml_sm::State enum) with a boolean flag.
+# States not listed for a mode default to true (available).
+state_masks:
+  Production:
+    ABORTING: true
+    ABORTED: true
+    CLEARING: true
+    STOPPING: true
+    STOPPED: true
+    RESETTING: true
+    IDLE: true
+    STARTING: true
+    EXECUTE: true
+    HOLDING: true
+    HELD: true
+    UNHOLDING: true
+    SUSPENDING: true
+    SUSPENDED: true
+    UNSUSPENDING: true
+    COMPLETING: true
+    COMPLETE: true
+  Maintenance:
+    ABORTING: true
+    ABORTED: true
+    CLEARING: true
+    STOPPING: true
+    STOPPED: true
+    RESETTING: true
+    IDLE: true
+    STARTING: true
+    EXECUTE: true
+    HOLDING: true
+    HELD: true
+    UNHOLDING: true
+    SUSPENDING: true
+    SUSPENDED: true
+    UNSUSPENDING: true
+    COMPLETING: false
+    COMPLETE: false
+  Manual:
+    ABORTING: true
+    ABORTED: true
+    CLEARING: true
+    STOPPING: true
+    STOPPED: true
+    RESETTING: true
+    IDLE: true
+    STARTING: true
+    EXECUTE: true
+    HOLDING: true
+    HELD: true
+    UNHOLDING: true
+    SUSPENDING: true
+    SUSPENDED: true
+    UNSUSPENDING: true
+    COMPLETING: true
+    COMPLETE: true

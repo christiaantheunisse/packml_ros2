@@ -40,7 +40,7 @@ class StatesGenerator {
 public:
   enum class TransitionType { ERROR, STATE_COMPLETED, COMMAND };
 
-  using AvailableStates = std::map<State, bool>;
+  using AvailableStates = packml_sm::AvailableStates;
   using ModeSwitchStates = std::set<State>;
 
   AvailableStates Available = {

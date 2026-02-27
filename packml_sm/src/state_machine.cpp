@@ -403,8 +403,7 @@ std::expected<bool, std::string> StateMachine::changeState(TransitionCmd command
 
 std::expected<bool, std::string> StateMachine::changeMode(ModeType mode)
 {
-  // TODO: define available states elsewhere
-  StatesGenerator::AvailableStates avail{
+  AvailableStates avail{
     {State::ABORTING, true},
     {State::ABORTED, true},
     {State::CLEARING, true},
@@ -423,32 +422,11 @@ std::expected<bool, std::string> StateMachine::changeMode(ModeType mode)
     {State::COMPLETING, true},
     {State::COMPLETE, true},
   };
+  return changeMode(mode, avail);
+}
 
-  if (mode == ModeType::MAINTENANCE)
-  {
-    // We disabled the state completing here!
-    avail =
-    {
-    {State::ABORTING, true},
-    {State::ABORTED, true},
-    {State::CLEARING, true},
-    {State::STOPPING, true},
-    {State::STOPPED, true},
-    {State::RESETTING, true},
-    {State::IDLE, true},
-    {State::STARTING, true},
-    {State::EXECUTE, true},
-    {State::HOLDING, true},
-    {State::HELD, true},
-    {State::UNHOLDING, true},
-    {State::SUSPENDING, true},
-    {State::SUSPENDED, true},
-    {State::UNSUSPENDING, true},
-    {State::COMPLETING, false},
-    {State::COMPLETE, true},
-    };
-  }
-
+std::expected<bool, std::string> StateMachine::changeMode(ModeType mode, AvailableStates avail)
+{
   // TODO: Mode should have reference to ModeType?
   StatesGenerator::Mode mode1 = StatesGenerator::Mode(to_string(mode), avail);
 
