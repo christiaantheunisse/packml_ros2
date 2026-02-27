@@ -14,9 +14,11 @@
 
 #pragma once
 
-#include <fstream>
+#include <iostream>
 #include <map>
 #include <string>
+
+#include <yaml-cpp/yaml.h>
 
 #include "packml_sm/common.hpp"
 
@@ -36,147 +38,95 @@ parse_modes_config(const std::string & yaml_file)
 {
   std::map<packml_sm::ModeType, packml_sm::AvailableStates> result;
 
-  std::ifstream f(yaml_file);
-  if (!f.is_open()) {
-    std::cerr << "[modes_config] Cannot open modes config file: " << yaml_file << std::endl;
-    return result;
-  }
-
   // Build the complete map of PackML state names → State enum values.
   const std::map<std::string, packml_sm::State> state_name_map = {
-    {"ABORTING",    packml_sm::State::ABORTING},
-    {"ABORTED",     packml_sm::State::ABORTED},
-    {"CLEARING",    packml_sm::State::CLEARING},
-    {"STOPPING",    packml_sm::State::STOPPING},
-    {"STOPPED",     packml_sm::State::STOPPED},
-    {"RESETTING",   packml_sm::State::RESETTING},
-    {"IDLE",        packml_sm::State::IDLE},
-    {"STARTING",    packml_sm::State::STARTING},
-    {"EXECUTE",     packml_sm::State::EXECUTE},
-    {"HOLDING",     packml_sm::State::HOLDING},
-    {"HELD",        packml_sm::State::HELD},
-    {"UNHOLDING",   packml_sm::State::UNHOLDING},
-    {"SUSPENDING",  packml_sm::State::SUSPENDING},
-    {"SUSPENDED",   packml_sm::State::SUSPENDED},
+    {"ABORTING",     packml_sm::State::ABORTING},
+    {"ABORTED",      packml_sm::State::ABORTED},
+    {"CLEARING",     packml_sm::State::CLEARING},
+    {"STOPPING",     packml_sm::State::STOPPING},
+    {"STOPPED",      packml_sm::State::STOPPED},
+    {"RESETTING",    packml_sm::State::RESETTING},
+    {"IDLE",         packml_sm::State::IDLE},
+    {"STARTING",     packml_sm::State::STARTING},
+    {"EXECUTE",      packml_sm::State::EXECUTE},
+    {"HOLDING",      packml_sm::State::HOLDING},
+    {"HELD",         packml_sm::State::HELD},
+    {"UNHOLDING",    packml_sm::State::UNHOLDING},
+    {"SUSPENDING",   packml_sm::State::SUSPENDING},
+    {"SUSPENDED",    packml_sm::State::SUSPENDED},
     {"UNSUSPENDING", packml_sm::State::UNSUSPENDING},
-    {"COMPLETING",  packml_sm::State::COMPLETING},
-    {"COMPLETE",    packml_sm::State::COMPLETE},
+    {"COMPLETING",   packml_sm::State::COMPLETING},
+    {"COMPLETE",     packml_sm::State::COMPLETE},
   };
 
-  // All-true defaults.
+  // All-true defaults used when a state is not listed under a mode mask.
   packml_sm::AvailableStates all_true;
   for (const auto & [name, state] : state_name_map) {
     all_true[state] = true;
   }
 
-  // --- Minimal line-by-line YAML parser ---
-  // Tracks indentation depth:
-  //   indent 0  → top-level section key ("modes:" / "state_masks:")
-  //   indent 2  → mode name key under a section
-  //   indent 4  → state name key under a mode name
-  enum class Section { NONE, MODES, STATE_MASKS };
+  YAML::Node root;
+  try {
+    root = YAML::LoadFile(yaml_file);
+  } catch (const YAML::Exception & e) {
+    std::cerr << "[modes_config] Failed to load YAML file '" << yaml_file
+              << "': " << e.what() << std::endl;
+    return result;
+  }
 
-  std::map<std::string, packml_sm::ModeType> mode_values;  // name → int
-  // name → (state → bool)
-  std::map<std::string, packml_sm::AvailableStates> raw_masks;
-
-  Section section = Section::NONE;
-  std::string current_mode_name;
-
-  auto trim = [](const std::string & s) -> std::string {
-    size_t start = s.find_first_not_of(" \t\r\n");
-    if (start == std::string::npos) return "";
-    size_t end = s.find_last_not_of(" \t\r\n");
-    return s.substr(start, end - start + 1);
-  };
-
-  auto indent_of = [](const std::string & s) -> int {
-    int n = 0;
-    for (char c : s) {
-      if (c == ' ') ++n;
-      else if (c == '\t') n += 2;
-      else break;
-    }
-    return n;
-  };
-
-  std::string line;
-  while (std::getline(f, line)) {
-    // Strip comment
-    auto comment_pos = line.find('#');
-    if (comment_pos != std::string::npos) {
-      line = line.substr(0, comment_pos);
-    }
-    if (trim(line).empty()) continue;
-
-    int indent = indent_of(line);
-    std::string content = trim(line);
-
-    // Find colon separator
-    auto colon = content.find(':');
-    if (colon == std::string::npos) continue;
-
-    std::string key = trim(content.substr(0, colon));
-    std::string val = trim(content.substr(colon + 1));
-
-    if (indent == 0) {
-      if (key == "modes") {
-        section = Section::MODES;
-      } else if (key == "state_masks") {
-        section = Section::STATE_MASKS;
-      } else {
-        section = Section::NONE;
+  // Parse mode names → integer values.
+  std::map<std::string, packml_sm::ModeType> mode_values;
+  if (root["modes"] && root["modes"].IsMap()) {
+    for (const auto & entry : root["modes"]) {
+      try {
+        mode_values[entry.first.as<std::string>()] =
+          entry.second.as<packml_sm::ModeType>();
+      } catch (const YAML::Exception & e) {
+        std::cerr << "[modes_config] Failed to parse mode value for '"
+                  << entry.first.as<std::string>() << "': " << e.what() << std::endl;
       }
-      current_mode_name.clear();
-      continue;
-    }
-
-    if (indent == 2) {
-      if (section == Section::MODES) {
-        if (!val.empty()) {
-          try {
-            mode_values[key] = std::stoi(val);
-          } catch (const std::exception & e) {
-            std::cerr << "[modes_config] Failed to parse mode value for '" << key
-                      << "': " << e.what() << std::endl;
-          }
-        }
-      } else if (section == Section::STATE_MASKS) {
-        current_mode_name = key;
-        // Initialise with all-true defaults so unlisted states still work.
-        if (raw_masks.find(current_mode_name) == raw_masks.end()) {
-          raw_masks[current_mode_name] = all_true;
-        }
-      }
-      continue;
-    }
-
-    if (indent == 4) {
-      if (section == Section::STATE_MASKS && !current_mode_name.empty()) {
-        auto it = state_name_map.find(key);
-        if (it != state_name_map.end()) {
-          if (val == "true" || val == "1" || val == "yes") {
-            raw_masks[current_mode_name][it->second] = true;
-          } else if (val == "false" || val == "0" || val == "no") {
-            raw_masks[current_mode_name][it->second] = false;
-          } else {
-            std::cerr << "[modes_config] Unrecognised boolean value '" << val
-                      << "' for state '" << key << "' in mode '" << current_mode_name
-                      << "', defaulting to true" << std::endl;
-            raw_masks[current_mode_name][it->second] = true;
-          }
-        }
-      }
-      continue;
     }
   }
 
-  // Combine modes + raw_masks → result (indexed by ModeType value).
-  for (const auto & [mode_name, avail] : raw_masks) {
-    auto it = mode_values.find(mode_name);
-    if (it != mode_values.end()) {
-      result[it->second] = avail;
+  // Parse per-mode state masks.
+  if (!root["state_masks"] || !root["state_masks"].IsMap()) {
+    std::cerr << "[modes_config] No 'state_masks' section found in '" << yaml_file
+              << "', all states will default to available" << std::endl;
+    return result;
+  }
+
+  for (const auto & mode_entry : root["state_masks"]) {
+    const std::string mode_name = mode_entry.first.as<std::string>();
+    auto mode_it = mode_values.find(mode_name);
+    if (mode_it == mode_values.end()) {
+      std::cerr << "[modes_config] state_masks entry '" << mode_name
+                << "' has no matching entry in 'modes', skipping" << std::endl;
+      continue;
     }
+
+    // Start from all-true defaults so unlisted states remain available.
+    packml_sm::AvailableStates avail = all_true;
+
+    if (mode_entry.second && mode_entry.second.IsMap()) {
+      for (const auto & state_entry : mode_entry.second) {
+        const std::string state_name = state_entry.first.as<std::string>();
+        auto state_it = state_name_map.find(state_name);
+        if (state_it == state_name_map.end()) {
+          std::cerr << "[modes_config] Unknown state name '" << state_name
+                    << "' in mask for mode '" << mode_name << "', skipping" << std::endl;
+          continue;
+        }
+        try {
+          avail[state_it->second] = state_entry.second.as<bool>();
+        } catch (const YAML::Exception & e) {
+          std::cerr << "[modes_config] Invalid boolean value for state '"
+                    << state_name << "' in mode '" << mode_name
+                    << "': " << e.what() << ", defaulting to true" << std::endl;
+        }
+      }
+    }
+
+    result[mode_it->second] = avail;
   }
 
   return result;

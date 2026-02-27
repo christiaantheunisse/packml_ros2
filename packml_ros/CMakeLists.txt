@@ -30,6 +30,7 @@ find_package(packml_msgs REQUIRED)
 find_package(packml_sm REQUIRED)
 # find_package(std_msgs REQUIRED)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 add_executable(${PROJECT_NAME}_node src/packml_ros_node.cpp)
 
@@ -45,7 +46,8 @@ target_link_libraries(
           ${packml_msgs_TARGETS}
           # std_msgs
           Qt5::Core
-          Qt5::Gui)
+          Qt5::Gui
+          yaml-cpp)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
@@ -60,7 +62,8 @@ target_link_libraries(
           packml_sm::packml_sm
           ${packml_msgs_TARGETS}
           # std_msgs
-          Qt5::Core)
+          Qt5::Core
+          yaml-cpp)
 
 #install
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
